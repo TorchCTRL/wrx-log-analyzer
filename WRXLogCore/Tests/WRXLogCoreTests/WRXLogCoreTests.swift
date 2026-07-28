@@ -162,3 +162,61 @@ func preservesUnknownMeasurementMeaning() {
         ) == .unknown
     )
 }
+
+@Test
+func extractsKnownUnitFromFinalHeaderSuffix() {
+    #expect(
+        HeaderUnitParser.unit(
+            for: "Engine Load (2-byte)** (g/rev)"
+        ) == "g/rev"
+    )
+
+    #expect(
+        HeaderUnitParser.unit(
+            for: "Manifold Relative Pressure (psi)"
+        ) == "psi"
+    )
+}
+
+@Test
+func doesNotTreatMeasurementAbbreviationAsUnit() {
+    #expect(
+        HeaderUnitParser.unit(
+            for: "A/F Sensor #1 (AFR)"
+        ) == nil
+    )
+
+    #expect(
+        HeaderUnitParser.unit(
+            for: "Dynamic Advance Multiplier (DAM)"
+        ) == nil
+    )
+}
+
+@Test
+func createsOrderedLogColumnsFromRawHeaders() {
+    let headers = [
+        "Engine Speed (rpm)",
+        "A/F Sensor #1 (AFR)",
+        "Manifold Relative Pressure (psi)"
+    ]
+
+    let columns = LogColumnFactory.columns(
+        from: headers
+    )
+
+    #expect(columns.count == 3)
+
+    #expect(columns[0].index == 0)
+    #expect(columns[0].originalHeader == "Engine Speed (rpm)")
+    #expect(columns[0].measurementType == .engineSpeed)
+    #expect(columns[0].unit == "rpm")
+
+    #expect(columns[1].index == 1)
+    #expect(columns[1].measurementType == .airFuelRatio)
+    #expect(columns[1].unit == nil)
+
+    #expect(columns[2].index == 2)
+    #expect(columns[2].measurementType == .boostPressure)
+    #expect(columns[2].unit == "psi")
+}
