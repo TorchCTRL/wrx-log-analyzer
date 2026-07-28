@@ -117,3 +117,48 @@ func rejectsSnapshotWhoseValueCountDoesNotMatchColumns() {
         )
     }
 }
+
+@Test
+func recognizesKnownROMRaiderHeaders() {
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Engine Speed (rpm)"
+        ) == .engineSpeed
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "A/F Sensor #1 (AFR)"
+        ) == .airFuelRatio
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Manifold Relative Pressure (psi)"
+        ) == .boostPressure
+    )
+}
+
+@Test
+func recognizesAliasesRegardlessOfCaseAndOuterWhitespace() {
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "  RPM  "
+        ) == .engineSpeed
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "dam"
+        ) == .dynamicAdvanceMultiplier
+    )
+}
+
+@Test
+func preservesUnknownMeasurementMeaning() {
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Custom Calculated Load (%)"
+        ) == .unknown
+    )
+}
