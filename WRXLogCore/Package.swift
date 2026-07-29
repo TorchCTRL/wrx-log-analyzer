@@ -18,7 +18,10 @@ let package = Package(
             name: "WRXLogCore"),
         .testTarget(
             name: "WRXLogCoreTests",
-            dependencies: ["WRXLogCore"]
+            dependencies: ["WRXLogCore"],
+            resources: [
+                .process("Resources")
+            ]
         ),
     ]
 )
