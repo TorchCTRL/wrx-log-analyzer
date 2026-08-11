@@ -2,9 +2,6 @@ import Foundation
 import Testing
 @testable import WRXLogCore
 
-import Testing
-@testable import WRXLogCore
-
 @Test
 func parsesValidROMRaiderCSVIntoEngineLog() throws {
     let csv = """
@@ -78,6 +75,33 @@ func skipsRowsWhoseCellCountDoesNotMatchHeader() throws {
                 expected: 3,
                 actual: 2
             )
+        ]
+    )
+}
+
+@Test
+func warnsWhenNoMeasurementsAreRecognized() throws {
+    let csv = """
+    Custom Sensor,Calculated Value,Unrecognized Parameter
+    10.5,20.25,30
+    """
+
+    let result = try ROMRaiderCSVParser.parse(csv)
+
+    #expect(result.log.columns.count == 3)
+    #expect(
+        result.log.columns.allSatisfy {
+            $0.measurementType == .unknown
+        }
+    )
+
+    #expect(result.parsedRowCount == 1)
+    #expect(result.skippedRowCount == 0)
+    #expect(result.log.snapshots[0].values == [10.5, 20.25, 30])
+
+    #expect(
+        result.warnings == [
+            .noRecognizedMeasurements
         ]
     )
 }

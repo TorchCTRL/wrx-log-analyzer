@@ -25,4 +25,6 @@ public enum ROMRaiderCSVParserWarning: Equatable, Sendable {
     case malformedRow(
         sourceLineNumber: Int
     )
+    
+    case noRecognizedMeasurements
 }

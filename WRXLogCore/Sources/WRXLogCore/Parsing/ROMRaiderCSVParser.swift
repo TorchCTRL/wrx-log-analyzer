@@ -57,6 +57,12 @@ public enum ROMRaiderCSVParser {
         var warnings: [ROMRaiderCSVParserWarning] = []
         var totalDataRowCount = 0
         var skippedRowCount = 0
+        
+        if columns.allSatisfy({
+            $0.measurementType == .unknown
+        }) {
+            warnings.append(.noRecognizedMeasurements)
+        }
 
         for lineIndex in lines.indices where lineIndex > headerLineIndex {
             let rawLine = lines[lineIndex]
