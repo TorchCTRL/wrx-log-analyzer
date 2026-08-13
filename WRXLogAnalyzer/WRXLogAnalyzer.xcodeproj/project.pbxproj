@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		37B3A99A302BD732009DAFEB /* WRXLogCore in Frameworks */ = {isa = PBXBuildFile; productRef = 37B3A999302BD732009DAFEB /* WRXLogCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		37C28189300853B4009DB66F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37B3A99A302BD732009DAFEB /* WRXLogCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = WRXLogAnalyzer;
 			packageProductDependencies = (
+				37B3A999302BD732009DAFEB /* WRXLogCore */,
 			);
 			productName = WRXLogAnalyzer;
 			productReference = 37C2817B300853B3009DB66F /* WRXLogAnalyzer.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 37C28172300853B3009DB66F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				37B3A998302BD732009DAFEB /* XCLocalSwiftPackageReference "../WRXLogCore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 37C2817C300853B3009DB66F /* Products */;
 			projectDirPath = "";
@@ -550,6 +559,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		37B3A998302BD732009DAFEB /* XCLocalSwiftPackageReference "../WRXLogCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../WRXLogCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		37B3A999302BD732009DAFEB /* WRXLogCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WRXLogCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 37C28173300853B3009DB66F /* Project object */;
 }
