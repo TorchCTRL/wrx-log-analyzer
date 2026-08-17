@@ -6,6 +6,10 @@ struct ContentView: View {
     @State private var isShowingFileImporter = false
     @State private var importMessage = "No log imported yet."
 
+    @State private var importedResult: ROMRaiderParseResult?
+    @State private var importedFileName = ""
+    @State private var isShowingImportResults = false
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -33,6 +37,16 @@ struct ContentView: View {
                 allowsMultipleSelection: false
             ) { result in
                 handleFileSelection(result)
+            }
+            .navigationDestination(
+                isPresented: $isShowingImportResults
+            ) {
+                if let importedResult {
+                    ImportResultsView(
+                        fileName: importedFileName,
+                        result: importedResult
+                    )
+                }
             }
         }
     }
@@ -72,12 +86,17 @@ struct ContentView: View {
 
             let result = try ROMRaiderCSVParser.parse(csvText)
 
+            importedResult = result
+            importedFileName = fileURL.lastPathComponent
+
             importMessage = """
             Imported \(fileURL.lastPathComponent)
             Columns: \(result.log.columns.count)
             Rows: \(result.log.snapshots.count)
             Warnings: \(result.warnings.count)
             """
+            isShowingImportResults = true
+
         } catch {
             importMessage = """
             Could not import \(fileURL.lastPathComponent):
