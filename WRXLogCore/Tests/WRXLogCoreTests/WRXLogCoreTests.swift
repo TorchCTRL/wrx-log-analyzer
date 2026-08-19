@@ -220,3 +220,105 @@ func createsOrderedLogColumnsFromRawHeaders() {
     #expect(columns[2].measurementType == .boostPressure)
     #expect(columns[2].unit == "psi")
 }
+
+@Test
+func createsMeasurementSeriesAndPreservesSamplePositions() throws {
+    let columns = [
+        LogColumn(
+            index: 0,
+            originalHeader: "Engine Speed (rpm)",
+            measurementType: .engineSpeed,
+            unit: "rpm"
+        ),
+        LogColumn(
+            index: 1,
+            originalHeader: "A/F Sensor #1 (AFR)",
+            measurementType: .airFuelRatio
+        )
+    ]
+
+    let snapshots = [
+        EngineSnapshot(
+            sourceLineNumber: 2,
+            values: [2000, 14.7]
+        ),
+        EngineSnapshot(
+            sourceLineNumber: 3,
+            values: [nil, 14.6]
+        ),
+        EngineSnapshot(
+            sourceLineNumber: 4,
+            values: [2200, 14.5]
+        )
+    ]
+
+    let log = try EngineLog(
+        columns: columns,
+        snapshots: snapshots
+    )
+
+    let series = log.series(for: .engineSpeed)
+
+    #expect(series?.column == columns[0])
+    #expect(
+        series?.samples == [
+            MeasurementSample(
+                snapshotIndex: 0,
+                sourceLineNumber: 2,
+                value: 2000
+            ),
+            MeasurementSample(
+                snapshotIndex: 2,
+                sourceLineNumber: 4,
+                value: 2200
+            )
+        ]
+    )
+}
+
+@Test
+func returnsNilWhenRequestedMeasurementIsAbsent() throws {
+    let columns = [
+        LogColumn(
+            index: 0,
+            originalHeader: "Engine Speed (rpm)",
+            measurementType: .engineSpeed,
+            unit: "rpm"
+        )
+    ]
+
+    let log = try EngineLog(
+        columns: columns,
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [2000]
+            )
+        ]
+    )
+
+    #expect(log.series(for: .boostPressure) == nil)
+}
+
+@Test
+func returnsNilForUnknownMeasurementSeries() throws {
+    let columns = [
+        LogColumn(
+            index: 0,
+            originalHeader: "Custom Measurement",
+            measurementType: .unknown
+        )
+    ]
+
+    let log = try EngineLog(
+        columns: columns,
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [42]
+            )
+        ]
+    )
+
+    #expect(log.series(for: .unknown) == nil)
+}
