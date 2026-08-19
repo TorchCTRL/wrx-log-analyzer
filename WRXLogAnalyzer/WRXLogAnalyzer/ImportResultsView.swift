@@ -27,6 +27,19 @@ struct ImportResultsView: View {
                 )
             }
 
+            Section {
+                NavigationLink {
+                    MeasurementChartView(
+                        log: result.log
+                    )
+                } label: {
+                    Label(
+                        "View Measurement Chart",
+                        systemImage: "chart.xyaxis.line"
+                    )
+                }
+            }
+
             Section("Measurements") {
                 ForEach(
                     result.log.columns.indices,
