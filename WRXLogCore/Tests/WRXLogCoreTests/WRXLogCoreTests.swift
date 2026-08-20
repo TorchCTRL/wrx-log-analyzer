@@ -322,3 +322,54 @@ func returnsNilForUnknownMeasurementSeries() throws {
 
     #expect(log.series(for: .unknown) == nil)
 }
+
+@Test
+func calculatesMeasurementSeriesStatistics() {
+    let series = MeasurementSeries(
+        column: LogColumn(
+            index: 0,
+            originalHeader: "Engine Speed (rpm)",
+            measurementType: .engineSpeed,
+            unit: "rpm"
+        ),
+        samples: [
+            MeasurementSample(
+                snapshotIndex: 0,
+                sourceLineNumber: 2,
+                value: 2000
+            ),
+            MeasurementSample(
+                snapshotIndex: 1,
+                sourceLineNumber: 3,
+                value: 2500
+            ),
+            MeasurementSample(
+                snapshotIndex: 2,
+                sourceLineNumber: 4,
+                value: 3000
+            )
+        ]
+    )
+
+    let statistics = series.statistics
+
+    #expect(statistics?.minimum == 2000)
+    #expect(statistics?.maximum == 3000)
+    #expect(statistics?.average == 2500)
+    #expect(statistics?.sampleCount == 3)
+}
+
+@Test
+func returnsNilStatisticsForEmptySeries() {
+    let series = MeasurementSeries(
+        column: LogColumn(
+            index: 0,
+            originalHeader: "Engine Speed (rpm)",
+            measurementType: .engineSpeed,
+            unit: "rpm"
+        ),
+        samples: []
+    )
+
+    #expect(series.statistics == nil)
+}
