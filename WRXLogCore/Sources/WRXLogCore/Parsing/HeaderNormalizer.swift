@@ -29,6 +29,40 @@ public enum HeaderNormalizer {
              "boost":
             return .boostPressure
 
+        case "engine load (2-byte)** (g/rev)",
+             "engine load (g/rev)",
+             "engine load":
+            return .engineLoad
+
+        case "ignition total timing (degrees)",
+             "ignition total timing",
+             "ignition timing (degrees)",
+             "ignition timing":
+            return .ignitionTiming
+
+        case "knock sum* (count)",
+             "knock sum (count)",
+             "knock sum":
+            return .knockSum
+
+        case "primary wastegate duty cycle (%)",
+             "primary wastegate duty cycle",
+             "wastegate duty cycle (%)",
+             "wastegate duty cycle",
+             "wgdc":
+            return .wastegateDutyCycle
+
+        case "throttle opening angle (%)",
+             "throttle opening angle",
+             "throttle position (%)",
+             "throttle position":
+            return .throttleOpening
+
+        case "turbo dynamics integral (2-byte)** (absolute %)",
+             "turbo dynamics integral (absolute %)",
+             "turbo dynamics integral":
+            return .turboDynamicsIntegral
+
         case "feedback knock correction",
              "feedback knock correction (degrees)",
              "feedback knock":

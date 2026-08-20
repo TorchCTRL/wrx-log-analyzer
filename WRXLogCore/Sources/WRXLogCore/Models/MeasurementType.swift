@@ -6,8 +6,14 @@ public enum MeasurementType: Equatable, Sendable {
     case engineSpeed
     case airFuelRatio
     case boostPressure
+    case engineLoad
+    case ignitionTiming
+    case knockSum
     case feedbackKnock
     case fineLearningKnock
+    case wastegateDutyCycle
+    case throttleOpening
+    case turboDynamicsIntegral
     case dynamicAdvanceMultiplier
     case unknown
 }
