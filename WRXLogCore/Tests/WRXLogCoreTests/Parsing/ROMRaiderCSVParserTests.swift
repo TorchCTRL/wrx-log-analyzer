@@ -148,14 +148,34 @@ func parsesRealROMRaiderLogFixture() throws {
     #expect(result.log.columns[1].unit == nil)
 
     #expect(
-        result.log.columns[2].measurementType == .unknown
+        result.log.columns[2].measurementType == .engineLoad
     )
     #expect(result.log.columns[2].unit == "g/rev")
+
+    #expect(
+        result.log.columns[3].measurementType == .ignitionTiming
+    )
+
+    #expect(
+        result.log.columns[4].measurementType == .knockSum
+    )
 
     #expect(
         result.log.columns[5].measurementType == .boostPressure
     )
     #expect(result.log.columns[5].unit == "psi")
+
+    #expect(
+        result.log.columns[6].measurementType == .wastegateDutyCycle
+    )
+
+    #expect(
+        result.log.columns[7].measurementType == .throttleOpening
+    )
+
+    #expect(
+        result.log.columns[8].measurementType == .turboDynamicsIntegral
+    )
 
     let firstSnapshot = try #require(
         result.log.snapshots.first

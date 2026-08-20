@@ -373,3 +373,44 @@ func returnsNilStatisticsForEmptySeries() {
 
     #expect(series.statistics == nil)
 }
+
+@Test
+func recognizesExpandedROMRaiderHeaders() {
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Engine Load (2-byte)** (g/rev)"
+        ) == .engineLoad
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Ignition Total Timing (degrees)"
+        ) == .ignitionTiming
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Knock Sum* (count)"
+        ) == .knockSum
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Primary Wastegate Duty Cycle (%)"
+        ) == .wastegateDutyCycle
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: "Throttle Opening Angle (%)"
+        ) == .throttleOpening
+    )
+
+    #expect(
+        HeaderNormalizer.measurementType(
+            for: """
+            Turbo Dynamics Integral (2-byte)** (absolute %)
+            """
+        ) == .turboDynamicsIntegral
+    )
+}

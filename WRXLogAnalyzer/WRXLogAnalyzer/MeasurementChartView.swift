@@ -11,8 +11,14 @@ struct MeasurementChartView: View {
         .engineSpeed,
         .airFuelRatio,
         .boostPressure,
+        .engineLoad,
+        .ignitionTiming,
+        .knockSum,
         .feedbackKnock,
         .fineLearningKnock,
+        .wastegateDutyCycle,
+        .throttleOpening,
+        .turboDynamicsIntegral,
         .dynamicAdvanceMultiplier
     ]
 
@@ -154,10 +160,22 @@ struct MeasurementChartView: View {
             return "Air-Fuel Ratio"
         case .boostPressure:
             return "Boost Pressure"
+        case .engineLoad:
+            return "Engine Load"
+        case .ignitionTiming:
+            return "Ignition Timing"
+        case .knockSum:
+            return "Knock Sum"
         case .feedbackKnock:
             return "Feedback Knock"
         case .fineLearningKnock:
             return "Fine Learning Knock"
+        case .wastegateDutyCycle:
+            return "Wastegate Duty Cycle"
+        case .throttleOpening:
+            return "Throttle Opening"
+        case .turboDynamicsIntegral:
+            return "Turbo Dynamics Integral"
         case .dynamicAdvanceMultiplier:
             return "Dynamic Advance Multiplier"
         case .unknown:
