@@ -83,6 +83,28 @@ struct MeasurementChartView: View {
                     .foregroundStyle(.secondary)
             }
 
+            if let statistics = series.statistics {
+                HStack(spacing: 8) {
+                    statisticCard(
+                        title: "Minimum",
+                        value: statistics.minimum,
+                        unit: series.column.unit
+                    )
+
+                    statisticCard(
+                        title: "Average",
+                        value: statistics.average,
+                        unit: series.column.unit
+                    )
+
+                    statisticCard(
+                        title: "Maximum",
+                        value: statistics.maximum,
+                        unit: series.column.unit
+                    )
+                }
+            }
+
             Chart(
                 series.samples,
                 id: \.snapshotIndex
@@ -141,5 +163,50 @@ struct MeasurementChartView: View {
         case .unknown:
             return "Unknown Measurement"
         }
+    }
+
+    private func statisticCard(
+        title: String,
+        value: Double,
+        unit: String?
+    ) -> some View {
+        VStack(spacing: 4) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text(
+                formattedValue(
+                    value,
+                    unit: unit
+                )
+            )
+            .font(.headline)
+            .lineLimit(1)
+            .minimumScaleFactor(0.65)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(
+            .thinMaterial,
+            in: RoundedRectangle(cornerRadius: 12)
+        )
+    }
+
+    private func formattedValue(
+        _ value: Double,
+        unit: String?
+    ) -> String {
+        let number = value.formatted(
+            .number.precision(
+                .fractionLength(0...2)
+            )
+        )
+
+        if let unit {
+            return "\(number) \(unit)"
+        }
+
+        return number
     }
 }
