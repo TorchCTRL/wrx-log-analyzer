@@ -414,3 +414,69 @@ func recognizesExpandedROMRaiderHeaders() {
         ) == .turboDynamicsIntegral
     )
 }
+
+@Test
+func createsSummariesForRecognizedMeasurements() throws {
+    let columns = [
+        LogColumn(
+            index: 0,
+            originalHeader: "Engine Speed (rpm)",
+            measurementType: .engineSpeed,
+            unit: "rpm"
+        ),
+        LogColumn(
+            index: 1,
+            originalHeader: "Custom Measurement",
+            measurementType: .unknown
+        ),
+        LogColumn(
+            index: 2,
+            originalHeader: "Manifold Relative Pressure (psi)",
+            measurementType: .boostPressure,
+            unit: "psi"
+        ),
+        LogColumn(
+            index: 3,
+            originalHeader: "A/F Sensor #1 (AFR)",
+            measurementType: .airFuelRatio
+        )
+    ]
+
+    let log = try EngineLog(
+        columns: columns,
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [2000, 42, 5, nil]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 3,
+                values: [3000, 43, nil, nil]
+            )
+        ]
+    )
+
+    let summaries = log.measurementSummaries
+
+    #expect(summaries.count == 2)
+
+    #expect(summaries[0].column == columns[0])
+    #expect(
+        summaries[0].statistics == MeasurementStatistics(
+            minimum: 2000,
+            maximum: 3000,
+            average: 2500,
+            sampleCount: 2
+        )
+    )
+
+    #expect(summaries[1].column == columns[2])
+    #expect(
+        summaries[1].statistics == MeasurementStatistics(
+            minimum: 5,
+            maximum: 5,
+            average: 5,
+            sampleCount: 1
+        )
+    )
+}
