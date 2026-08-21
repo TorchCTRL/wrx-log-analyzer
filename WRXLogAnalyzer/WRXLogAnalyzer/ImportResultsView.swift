@@ -29,6 +29,16 @@ struct ImportResultsView: View {
 
             Section {
                 NavigationLink {
+                    LogOverviewView(
+                        log: result.log
+                    )
+                } label: {
+                    Label(
+                        "View Log Overview",
+                        systemImage: "list.bullet.rectangle"
+                    )
+                }
+                NavigationLink {
                     MeasurementChartView(
                         log: result.log
                     )
