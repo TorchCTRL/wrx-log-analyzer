@@ -480,3 +480,66 @@ func createsSummariesForRecognizedMeasurements() throws {
         )
     )
 }
+
+@Test
+func createsObjectiveLogInsights() throws {
+    let columns = [
+        LogColumn(
+            index: 0,
+            originalHeader: "Engine Speed (rpm)",
+            measurementType: .engineSpeed,
+            unit: "rpm"
+        ),
+        LogColumn(
+            index: 1,
+            originalHeader: "Custom Measurement",
+            measurementType: .unknown
+        )
+    ]
+
+    let log = try EngineLog(
+        columns: columns,
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [2000, 42]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 3,
+                values: [nil, 43]
+            )
+        ]
+    )
+
+    let result = ROMRaiderParseResult(
+        log: log,
+        warnings: [
+            .blankValue(
+                sourceLineNumber: 3,
+                columnIndex: 0,
+                header: "Engine Speed (rpm)"
+            )
+        ],
+        totalDataRowCount: 3,
+        skippedRowCount: 1
+    )
+
+    #expect(
+        result.insights == [
+            LogInsight.importQuality(
+                parsedRowCount: 2,
+                totalDataRowCount: 3,
+                skippedRowCount: 1,
+                warningCount: 1
+            ),
+            LogInsight.measurementRecognition(
+                recognizedColumnCount: 1,
+                totalColumnCount: 2
+            ),
+            LogInsight.valueCoverage(
+                validValueCount: 1,
+                totalValueCount: 2
+            )
+        ]
+    )
+}

@@ -29,6 +29,16 @@ struct ImportResultsView: View {
 
             Section {
                 NavigationLink {
+                    LogInsightsView(
+                        result: result
+                    )
+                } label: {
+                    Label(
+                        "View Log Insights",
+                        systemImage: "lightbulb.fill"
+                    )
+                }
+                NavigationLink {
                     LogOverviewView(
                         log: result.log
                     )
