@@ -5,6 +5,14 @@ struct ImportResultsView: View {
     let fileName: String
     let result: ROMRaiderParseResult
 
+    @State private var analysisProfile = AnalysisProfile(
+        modelYear: nil,
+        engineFamily: .unknown,
+        tuneType: .unknown,
+        fuelType: .unknown,
+        logCondition: .unknown
+    )
+
     var body: some View {
         List {
             Section("Import Summary") {
@@ -28,6 +36,18 @@ struct ImportResultsView: View {
             }
 
             Section {
+                NavigationLink {
+                    AnalysisProfileView(
+                        profile: $analysisProfile
+                    )
+                } label: {
+                    Label(
+                        "Configure Analysis Profile",
+                        systemImage: analysisProfile.isComplete
+                            ? "checkmark.circle.fill"
+                            : "car.fill"
+                    )
+                }
                 NavigationLink {
                     LogInsightsView(
                         result: result
