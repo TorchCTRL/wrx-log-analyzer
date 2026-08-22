@@ -543,3 +543,31 @@ func createsObjectiveLogInsights() throws {
         ]
     )
 }
+
+@Test
+func distinguishesCompleteAndIncompleteAnalysisProfiles() {
+    let completeProfile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(completeProfile.modelYear == 2013)
+    #expect(completeProfile.engineFamily == .ej255)
+    #expect(completeProfile.tuneType == .stock)
+    #expect(completeProfile.fuelType == .octane93)
+    #expect(completeProfile.logCondition == .wideOpenThrottle)
+    #expect(completeProfile.isComplete)
+
+    let incompleteProfile = AnalysisProfile(
+        modelYear: nil,
+        engineFamily: .unknown,
+        tuneType: .unknown,
+        fuelType: .unknown,
+        logCondition: .unknown
+    )
+
+    #expect(!incompleteProfile.isComplete)
+}
