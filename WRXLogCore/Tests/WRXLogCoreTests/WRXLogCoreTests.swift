@@ -571,3 +571,158 @@ func distinguishesCompleteAndIncompleteAnalysisProfiles() {
 
     #expect(!incompleteProfile.isComplete)
 }
+
+@Test
+func returnsMostSignificantFindingForGreaterThanRule() throws {
+    let log = try EngineLog(
+        columns: [
+            LogColumn(
+                index: 0,
+                originalHeader: "Engine Speed (rpm)",
+                measurementType: .engineSpeed,
+                unit: "rpm"
+            )
+        ],
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [2500]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 3,
+                values: [3500]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 4,
+                values: [3200]
+            )
+        ]
+    )
+
+    let rule = MeasurementThresholdRule(
+        title: "Example Engine Speed Rule",
+        measurementType: .engineSpeed,
+        comparison: .greaterThan,
+        threshold: 3000,
+        severity: .caution
+    )
+
+    let finding = try #require(
+        log.finding(for: rule)
+    )
+
+    #expect(finding.rule == rule)
+    #expect(finding.observedValue == 3500)
+    #expect(finding.snapshotIndex == 1)
+    #expect(finding.sourceLineNumber == 3)
+}
+
+@Test
+func evaluatesMultipleThresholdRulesInOrder() throws {
+    let log = try EngineLog(
+        columns: [
+            LogColumn(
+                index: 0,
+                originalHeader: "Engine Speed (rpm)",
+                measurementType: .engineSpeed,
+                unit: "rpm"
+            ),
+            LogColumn(
+                index: 1,
+                originalHeader: "Manifold Relative Pressure (psi)",
+                measurementType: .boostPressure,
+                unit: "psi"
+            )
+        ],
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [2500, -2]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 3,
+                values: [3500, 5]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 4,
+                values: [3200, 1]
+            )
+        ]
+    )
+
+    let highEngineSpeedRule = MeasurementThresholdRule(
+        title: "Example High Engine Speed",
+        measurementType: .engineSpeed,
+        comparison: .greaterThan,
+        threshold: 3000,
+        severity: .caution
+    )
+
+    let lowBoostRule = MeasurementThresholdRule(
+        title: "Example Low Boost",
+        measurementType: .boostPressure,
+        comparison: .lessThan,
+        threshold: 0,
+        severity: .information
+    )
+
+    let absentAFRRule = MeasurementThresholdRule(
+        title: "Example AFR Rule",
+        measurementType: .airFuelRatio,
+        comparison: .lessThan,
+        threshold: 10,
+        severity: .critical
+    )
+
+    let findings = log.findings(
+        for: [
+            highEngineSpeedRule,
+            lowBoostRule,
+            absentAFRRule
+        ]
+    )
+
+    #expect(findings.count == 2)
+
+    #expect(findings[0].rule == highEngineSpeedRule)
+    #expect(findings[0].observedValue == 3500)
+    #expect(findings[0].sourceLineNumber == 3)
+
+    #expect(findings[1].rule == lowBoostRule)
+    #expect(findings[1].observedValue == -2)
+    #expect(findings[1].sourceLineNumber == 2)
+}
+
+@Test
+func returnsNilWhenNoSampleViolatesThresholdRule() throws {
+    let log = try EngineLog(
+        columns: [
+            LogColumn(
+                index: 0,
+                originalHeader: "Engine Speed (rpm)",
+                measurementType: .engineSpeed,
+                unit: "rpm"
+            )
+        ],
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [2500]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 3,
+                values: [3000]
+            )
+        ]
+    )
+
+    let rule = MeasurementThresholdRule(
+        title: "Example Nonviolating Rule",
+        measurementType: .engineSpeed,
+        comparison: .greaterThan,
+        threshold: 3000,
+        severity: .information
+    )
+
+    #expect(log.finding(for: rule) == nil)
+}
