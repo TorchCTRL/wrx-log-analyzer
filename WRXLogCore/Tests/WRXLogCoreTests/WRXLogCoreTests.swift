@@ -726,3 +726,111 @@ func returnsNilWhenNoSampleViolatesThresholdRule() throws {
 
     #expect(log.finding(for: rule) == nil)
 }
+
+@Test
+func selectsRulesOnlyForCompatibleCompleteProfile() {
+    let syntheticRule = MeasurementThresholdRule(
+        title: "Synthetic Profile Rule",
+        measurementType: .boostPressure,
+        comparison: .greaterThan,
+        threshold: 99,
+        severity: .information
+    )
+
+    let ruleSet = ProfileRuleSet(
+        name: "Synthetic Test Rule Set",
+        compatibility: AnalysisProfileCompatibility(
+            modelYearRange: 2010...2020,
+            engineFamilies: [.ej255],
+            tuneTypes: [.stock],
+            fuelTypes: [.octane91, .octane93],
+            logConditions: [.wideOpenThrottle]
+        ),
+        rules: [syntheticRule]
+    )
+
+    let compatibleProfile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(
+        ruleSet.rules(
+            for: compatibleProfile
+        ) == [syntheticRule]
+    )
+
+    let incompatibleProfile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .fa20DIT,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(
+        ruleSet.rules(
+            for: incompatibleProfile
+        ).isEmpty
+    )
+
+    let incompleteProfile = AnalysisProfile(
+        modelYear: nil,
+        engineFamily: .unknown,
+        tuneType: .unknown,
+        fuelType: .unknown,
+        logCondition: .unknown
+    )
+
+    #expect(
+        ruleSet.rules(
+            for: incompleteProfile
+        ).isEmpty
+    )
+}
+
+@Test
+func requiresEveryAnalysisProfileDimensionToMatch() {
+    let compatibility = AnalysisProfileCompatibility(
+        modelYearRange: 2010...2020,
+        engineFamilies: [.ej255],
+        tuneTypes: [.stock],
+        fuelTypes: [.octane91, .octane93],
+        logConditions: [.wideOpenThrottle]
+    )
+
+    let compatibleProfile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(
+        compatibility.supports(compatibleProfile)
+    )
+
+    var wrongYear = compatibleProfile
+    wrongYear.modelYear = 2009
+    #expect(!compatibility.supports(wrongYear))
+
+    var wrongEngine = compatibleProfile
+    wrongEngine.engineFamily = .fa20DIT
+    #expect(!compatibility.supports(wrongEngine))
+
+    var wrongTune = compatibleProfile
+    wrongTune.tuneType = .custom
+    #expect(!compatibility.supports(wrongTune))
+
+    var wrongFuel = compatibleProfile
+    wrongFuel.fuelType = .other
+    #expect(!compatibility.supports(wrongFuel))
+
+    var wrongCondition = compatibleProfile
+    wrongCondition.logCondition = .cruise
+    #expect(!compatibility.supports(wrongCondition))
+}
