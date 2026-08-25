@@ -37,6 +37,17 @@ struct ImportResultsView: View {
 
             Section {
                 NavigationLink {
+                    AnalysisReportView(
+                        log: result.log,
+                        profile: analysisProfile
+                    )
+                } label: {
+                    Label(
+                        "View Analysis Report",
+                        systemImage: "doc.text.magnifyingglass"
+                    )
+                }
+                NavigationLink {
                     AnalysisProfileView(
                         profile: $analysisProfile
                     )
