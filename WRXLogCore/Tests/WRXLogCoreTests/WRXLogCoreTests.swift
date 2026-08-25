@@ -834,3 +834,149 @@ func requiresEveryAnalysisProfileDimensionToMatch() {
     wrongCondition.logCondition = .cruise
     #expect(!compatibility.supports(wrongCondition))
 }
+
+@Test
+func providesSourcedEJ255DAMRuleForSupportedProfile() throws {
+    let profile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    let rules = WRXRuleCatalog.ej255DAM.rules(
+        for: profile
+    )
+
+    #expect(rules.count == 1)
+
+    let rule = try #require(rules.first)
+
+    #expect(rule.title == "Dynamic Advance Multiplier Below Maximum")
+    #expect(rule.measurementType == .dynamicAdvanceMultiplier)
+    #expect(rule.comparison == .lessThan)
+    #expect(rule.threshold == 1.0)
+    #expect(rule.severity == .caution)
+    #expect(!rule.explanation.isEmpty)
+
+    #expect(
+        rule.source == AnalysisRuleSource(
+            title: "COBB Subaru Knock Monitoring",
+            url: """
+            https://cobbtuning.atlassian.net/wiki/spaces/PRS/pages/338723039/Subaru+Knock+Monitoring
+            """
+        )
+    )
+}
+
+@Test
+func excludesUnsupportedProfilesFromEJ255DAMRule() {
+    let wrongYear = AnalysisProfile(
+        modelYear: 2015,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(
+        WRXRuleCatalog.ej255DAM.rules(
+            for: wrongYear
+        ).isEmpty
+    )
+
+    let ditEngine = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .fa20DIT,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(
+        WRXRuleCatalog.ej255DAM.rules(
+            for: ditEngine
+        ).isEmpty
+    )
+
+    let customTune = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .custom,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(
+        WRXRuleCatalog.ej255DAM.rules(
+            for: customTune
+        ).isEmpty
+    )
+
+    let ethanolFuel = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .ethanolBlend,
+        logCondition: .wideOpenThrottle
+    )
+
+    #expect(
+        WRXRuleCatalog.ej255DAM.rules(
+            for: ethanolFuel
+        ).isEmpty
+    )
+}
+
+@Test
+func evaluatesEJ255DAMRuleAgainstSyntheticLog() throws {
+    let profile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    let rule = try #require(
+        WRXRuleCatalog.ej255DAM.rules(
+            for: profile
+        ).first
+    )
+
+    let log = try EngineLog(
+        columns: [
+            LogColumn(
+                index: 0,
+                originalHeader: "Dynamic Advance Multiplier (DAM)",
+                measurementType: .dynamicAdvanceMultiplier
+            )
+        ],
+        snapshots: [
+            EngineSnapshot(
+                sourceLineNumber: 2,
+                values: [1.0]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 3,
+                values: [0.875]
+            ),
+            EngineSnapshot(
+                sourceLineNumber: 4,
+                values: [0.75]
+            )
+        ]
+    )
+
+    let finding = try #require(
+        log.finding(
+            for: rule
+        )
+    )
+
+    #expect(finding.observedValue == 0.75)
+    #expect(finding.snapshotIndex == 2)
+    #expect(finding.sourceLineNumber == 4)
+    #expect(finding.rule.severity == .caution)
+}
