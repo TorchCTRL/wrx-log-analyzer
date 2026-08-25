@@ -22,18 +22,28 @@ public struct MeasurementThresholdRule: Equatable, Sendable {
     public let threshold: Double
     public let severity: AnalysisSeverity
 
+    /// Context that helps the user interpret the rule safely.
+    public let explanation: String
+
+    /// Documentation supporting the rule, when available.
+    public let source: AnalysisRuleSource?
+
     public init(
         title: String,
         measurementType: MeasurementType,
         comparison: ThresholdComparison,
         threshold: Double,
-        severity: AnalysisSeverity
+        severity: AnalysisSeverity,
+        explanation: String = "",
+        source: AnalysisRuleSource? = nil
     ) {
         self.title = title
         self.measurementType = measurementType
         self.comparison = comparison
         self.threshold = threshold
         self.severity = severity
+        self.explanation = explanation
+        self.source = source
     }
 }
 
