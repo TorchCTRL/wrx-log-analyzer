@@ -195,3 +195,64 @@ func parsesRealROMRaiderLogFixture() throws {
     #expect(lastSnapshot.values[0] == 6693)
     #expect(lastSnapshot.values[5] == 7.98)
 }
+
+@Test
+func analyzesSyntheticEJ255DAMFixtureEndToEnd() throws {
+    let fileURL = try #require(
+        Bundle.module.url(
+            forResource: "synthetic_ej255_dam_drop",
+            withExtension: "csv"
+        )
+    )
+
+    let csvText = try String(
+        contentsOf: fileURL,
+        encoding: .utf8
+    )
+
+    let result = try ROMRaiderCSVParser.parse(
+        csvText
+    )
+
+    #expect(result.log.columns.count == 3)
+    #expect(result.parsedRowCount == 4)
+    #expect(result.skippedRowCount == 0)
+    #expect(result.warnings.isEmpty)
+
+    let damColumn = try #require(
+        result.log.columns.first {
+            $0.measurementType == .dynamicAdvanceMultiplier
+        }
+    )
+
+    #expect(
+        damColumn.originalHeader ==
+            "Dynamic Advance Multiplier (DAM)"
+    )
+
+    let profile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .stock,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    let rule = try #require(
+        WRXRuleCatalog.ej255DAM.rules(
+            for: profile
+        ).first
+    )
+
+    let finding = try #require(
+        result.log.finding(
+            for: rule
+        )
+    )
+
+    #expect(finding.observedValue == 0.75)
+    #expect(finding.snapshotIndex == 2)
+    #expect(finding.sourceLineNumber == 4)
+    #expect(finding.rule.severity == .caution)
+    #expect(finding.rule.source != nil)
+}

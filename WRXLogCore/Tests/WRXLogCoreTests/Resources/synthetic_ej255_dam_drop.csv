@@ -1,0 +1,5 @@
+Engine Speed (rpm),Dynamic Advance Multiplier (DAM),Feedback Knock Correction (degrees)
+2500,1.0,0
+3000,0.875,-1.4
+3500,0.75,-2.8
+4000,1.0,0
