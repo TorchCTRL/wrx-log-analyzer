@@ -1,5 +1,5 @@
 /// Engine families commonly used by supported Subaru applications.
-public enum EngineFamily: String, CaseIterable, Hashable, Sendable {
+public enum EngineFamily: String, CaseIterable, Hashable, Codable, Sendable {
     case ej205 = "EJ205"
     case ej255 = "EJ255"
     case fa20DIT = "FA20DIT"
@@ -9,7 +9,7 @@ public enum EngineFamily: String, CaseIterable, Hashable, Sendable {
 }
 
 /// Describes how the vehicle's ECU calibration was created.
-public enum TuneType: String, CaseIterable, Hashable, Sendable {
+public enum TuneType: String, CaseIterable, Hashable, Codable, Sendable {
     case stock = "Stock"
     case offTheShelf = "Off-the-Shelf"
     case custom = "Custom"
@@ -17,7 +17,7 @@ public enum TuneType: String, CaseIterable, Hashable, Sendable {
 }
 
 /// Describes the fuel used while recording the log.
-public enum FuelType: String, CaseIterable, Hashable, Sendable {
+public enum FuelType: String, CaseIterable, Hashable, Codable, Sendable {
     case octane91 = "91 Octane"
     case octane93 = "93 Octane"
     case ethanolBlend = "Ethanol Blend"
@@ -26,7 +26,7 @@ public enum FuelType: String, CaseIterable, Hashable, Sendable {
 }
 
 /// Describes the driving activity represented by the log.
-public enum LogCondition: String, CaseIterable, Hashable, Sendable {
+public enum LogCondition: String, CaseIterable, Hashable, Codable, Sendable {
     case idle = "Idle"
     case cruise = "Cruise"
     case acceleration = "Acceleration"
@@ -36,7 +36,7 @@ public enum LogCondition: String, CaseIterable, Hashable, Sendable {
 }
 
 /// Context required before vehicle-specific analysis rules can run.
-public struct AnalysisProfile: Equatable, Sendable {
+public struct AnalysisProfile: Equatable, Codable, Sendable {
     public var modelYear: Int?
     public var engineFamily: EngineFamily
     public var tuneType: TuneType

@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import WRXLogCore
 
@@ -570,6 +571,26 @@ func distinguishesCompleteAndIncompleteAnalysisProfiles() {
     )
 
     #expect(!incompleteProfile.isComplete)
+}
+
+@Test
+func preservesAnalysisProfileThroughCodableRoundTrip() throws {
+    let originalProfile = AnalysisProfile(
+        modelYear: 2013,
+        engineFamily: .ej255,
+        tuneType: .custom,
+        fuelType: .octane93,
+        logCondition: .wideOpenThrottle
+    )
+
+    let encodedProfile = try JSONEncoder().encode(originalProfile)
+
+    let decodedProfile = try JSONDecoder().decode(
+        AnalysisProfile.self,
+        from: encodedProfile
+    )
+
+    #expect(decodedProfile == originalProfile)
 }
 
 @Test
