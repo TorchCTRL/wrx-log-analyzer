@@ -5,13 +5,7 @@ struct ImportResultsView: View {
     let fileName: String
     let result: ROMRaiderParseResult
 
-    @State private var analysisProfile = AnalysisProfile(
-        modelYear: nil,
-        engineFamily: .unknown,
-        tuneType: .unknown,
-        fuelType: .unknown,
-        logCondition: .unknown
-    )
+    @Binding var analysisProfile: AnalysisProfile
 
     var body: some View {
         List {
