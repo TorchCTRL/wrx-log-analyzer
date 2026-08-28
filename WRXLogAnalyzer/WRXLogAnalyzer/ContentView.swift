@@ -3,6 +3,15 @@ import UniformTypeIdentifiers
 import WRXLogCore
 
 struct ContentView: View {
+    @State private var analysisProfile = AnalysisProfile(
+        modelYear: nil,
+        engineFamily: .unknown,
+        tuneType: .unknown,
+        fuelType: .unknown,
+        logCondition: .unknown
+    )
+
+    private let analysisProfileStore = AnalysisProfileStore()
     @State private var isShowingFileImporter = false
     @State private var importMessage = "No log imported yet."
 
@@ -16,20 +25,26 @@ struct ContentView: View {
                 Image(systemName: "waveform.path.ecg")
                     .font(.system(size: 60))
                     .foregroundStyle(.blue)
-
                 Text("WRX Log Analyzer")
                     .font(.title)
                     .fontWeight(.bold)
-
                 Text(importMessage)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
-
                 Button("Import ROMRaider CSV") {
                     isShowingFileImporter = true
                 }
                 .buttonStyle(.borderedProminent)
             }
+            .padding()
+                .onAppear {
+                    if let savedProfile = analysisProfileStore.load() {
+                        analysisProfile = savedProfile
+                    }
+                }
+                .onChange(of: analysisProfile) { _, newProfile in
+                    try? analysisProfileStore.save(newProfile)
+                }
             .padding()
             .fileImporter(
                 isPresented: $isShowingFileImporter,
@@ -44,7 +59,8 @@ struct ContentView: View {
                 if let importedResult {
                     ImportResultsView(
                         fileName: importedFileName,
-                        result: importedResult
+                        result: importedResult,
+                        analysisProfile: $analysisProfile
                     )
                 }
             }
