@@ -7,11 +7,14 @@ struct AnalysisProfileView: View {
     var body: some View {
         Form {
             Section("Vehicle") {
-                TextField(
-                    "Model Year",
-                    text: modelYearText
-                )
-                .keyboardType(.numberPad)
+                LabeledContent("Model Year") {
+                    TextField(
+                        "Year",
+                        text: modelYearText
+                    )
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                }
 
                 Picker(
                     "Engine Family",
