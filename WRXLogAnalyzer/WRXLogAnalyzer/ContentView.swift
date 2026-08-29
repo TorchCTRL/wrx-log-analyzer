@@ -25,16 +25,39 @@ struct ContentView: View {
                 Image(systemName: "waveform.path.ecg")
                     .font(.system(size: 60))
                     .foregroundStyle(.blue)
+
                 Text("WRX Log Analyzer")
                     .font(.title)
                     .fontWeight(.bold)
+
+                Text(
+                    """
+                    Import Subaru ECU logs to review measurements, visualize data, \
+                    and run profile-aware analysis rules.
+                    """
+                )
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+
                 Text(importMessage)
+                    .font(.subheadline)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
-                Button("Import ROMRaider CSV") {
+
+                Button {
                     isShowingFileImporter = true
+                } label: {
+                    Label(
+                        "Import ROMRaider CSV",
+                        systemImage: "doc.badge.plus"
+                    )
                 }
                 .buttonStyle(.borderedProminent)
+
+                Text("Analysis only — this app does not modify or flash the ECU.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
             .padding()
                 .onAppear {
