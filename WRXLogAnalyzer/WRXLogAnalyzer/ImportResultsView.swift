@@ -29,7 +29,22 @@ struct ImportResultsView: View {
                 )
             }
 
-            Section {
+            Section("Analysis") {
+                NavigationLink {
+                    AnalysisProfileView(
+                        profile: $analysisProfile
+                    )
+                } label: {
+                    Label(
+                        analysisProfile.isComplete
+                            ? "Review Analysis Profile"
+                            : "Configure Analysis Profile",
+                        systemImage: analysisProfile.isComplete
+                            ? "checkmark.circle.fill"
+                            : "car.fill"
+                    )
+                }
+
                 NavigationLink {
                     AnalysisReportView(
                         log: result.log,
@@ -41,18 +56,20 @@ struct ImportResultsView: View {
                         systemImage: "doc.text.magnifyingglass"
                     )
                 }
-                NavigationLink {
-                    AnalysisProfileView(
-                        profile: $analysisProfile
+
+                if !analysisProfile.isComplete {
+                    Text(
+                        """
+                        Complete the analysis profile before profile-specific \
+                        rules can run.
+                        """
                     )
-                } label: {
-                    Label(
-                        "Configure Analysis Profile",
-                        systemImage: analysisProfile.isComplete
-                            ? "checkmark.circle.fill"
-                            : "car.fill"
-                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
+            }
+
+            Section("Explore Log") {
                 NavigationLink {
                     LogInsightsView(
                         result: result
@@ -63,6 +80,7 @@ struct ImportResultsView: View {
                         systemImage: "lightbulb.fill"
                     )
                 }
+
                 NavigationLink {
                     LogOverviewView(
                         log: result.log
@@ -73,6 +91,7 @@ struct ImportResultsView: View {
                         systemImage: "list.bullet.rectangle"
                     )
                 }
+
                 NavigationLink {
                     MeasurementChartView(
                         log: result.log

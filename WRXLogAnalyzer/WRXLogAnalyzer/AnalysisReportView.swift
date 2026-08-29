@@ -35,7 +35,9 @@ struct AnalysisReportView: View {
 
     var body: some View {
         List {
-            Section("Profile Used") {
+            analysisSections
+
+            Section("Analysis Context") {
                 LabeledContent(
                     "Model Year",
                     value: profile.modelYear.map {
@@ -63,8 +65,6 @@ struct AnalysisReportView: View {
                     value: profile.logCondition.rawValue
                 )
             }
-
-            analysisSections
 
             Section("Important") {
                 Text(
