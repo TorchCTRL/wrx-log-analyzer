@@ -48,6 +48,76 @@ The analysis system is intentionally conservative and does not claim to diagnose
 - SwiftUI
 - Swift Package Manager
 - Swift Testing
-- Apple Charts
+- Charts
 - UserDefaults
 - Git and GitHub
+
+## Architecture
+
+The project is split into an iOS application and a reusable Swift package.
+
+```text
+ROMRaider CSV File
+        ↓
+   WRXLogCore
+        ↓
+CSV Parser
+        ↓
+EngineLog and Measurement Models
+        ↓
+Statistics / Log Insights
+        ↓
+Profile-Aware Analysis Rules
+        ↓
+   SwiftUI App
+        ↓
+Import Results / Analysis Report / Measurement Charts
+```
+
+### `WRXLogCore`
+
+`WRXLogCore` contains the reusable domain and analysis logic, including ROMRaider CSV parsing, ECU measurement recognition, engine-log models, measurement statistics, log insights, analysis-profile compatibility, threshold-rule evaluation, and sourced WRX analysis rules.
+
+Keeping this logic separate from the SwiftUI application allows the core functionality to be tested independently from the user interface.
+
+### `WRXLogAnalyzer`
+
+`WRXLogAnalyzer` is the iOS application and handles the user-facing workflow, including CSV importing, analysis-profile configuration and persistence, import summaries, warnings, analysis reports, and measurement charts.
+
+## Example Analysis
+
+A synthetic EJ255 DAM log is included in the test suite to exercise the analysis pipeline end to end.
+
+For example, with the following compatible analysis profile:
+
+```text
+Model Year:        2013
+Engine Family:     EJ255
+Tune Type:         Stock
+Fuel:              93 Octane
+Driving Condition: Wide-Open Throttle
+```
+
+a recorded Dynamic Advance Multiplier value of `0.75` is evaluated against the configured DAM threshold of `1.0`.
+
+The application generates a **Caution** finding that includes the observed value, rule threshold, CSV source line, a plain-language explanation, and a link to the supporting technical source.
+
+```text
+CSV Log
+   ↓
+ROMRaider Parser
+   ↓
+EngineLog
+   ↓
+DAM Measurement
+   ↓
+Profile Compatibility Check
+   ↓
+DAM Threshold Rule
+   ↓
+AnalysisFinding
+   ↓
+Analysis Report
+```
+
+The analysis is intentionally conservative and non-diagnostic. A low DAM value can have multiple causes, including ECU reset or reflash behavior, so the application presents the finding with context rather than claiming that engine damage has occurred.
