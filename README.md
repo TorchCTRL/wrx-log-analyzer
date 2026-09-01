@@ -52,6 +52,23 @@ The analysis system is intentionally conservative and does not claim to diagnose
 - UserDefaults
 - Git and GitHub
 
+## Demo Workflow
+
+A typical analysis workflow is:
+
+```text
+Import ROMRaider CSV
+        ↓
+Review import summary and warnings
+        ↓
+Configure or review analysis profile
+        ↓
+Run compatible analysis rules
+        ↓
+Review sourced findings
+        ↓
+Explore measurements and charts
+
 ## Architecture
 
 The project is split into an iOS application and a reusable Swift package.
