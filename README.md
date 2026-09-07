@@ -138,3 +138,75 @@ Analysis Report
 ```
 
 The analysis is intentionally conservative and non-diagnostic. A low DAM value can have multiple causes, including ECU reset or reflash behavior, so the application presents the finding with context rather than claiming that engine damage has occurred.
+
+## Testing
+
+The project includes automated tests for core parsing, modeling, persistence, and analysis behavior.
+
+Current test coverage includes:
+
+- CSV row parsing
+- ROMRaider header recognition
+- blank and invalid values
+- malformed rows
+- measurement extraction
+- measurement statistics
+- analysis-profile completeness and compatibility
+- analysis-profile encoding and decoding
+- analysis-profile persistence
+- threshold-rule evaluation
+- end-to-end EJ255 DAM analysis
+
+The current `WRXLogCore` test suite contains 41 passing Swift tests. The iOS app also includes a persistence test that verifies an analysis profile can be saved and restored.
+
+## Running the Project
+
+### Requirements
+
+- macOS
+- Xcode 16.4 or later
+- an iOS Simulator or compatible iOS device
+
+### Run the iOS App
+
+1. Clone the repository.
+2. Open the Xcode project inside `WRXLogAnalyzer`.
+3. Select an iOS Simulator.
+4. Build and run the `WRXLogAnalyzer` target.
+5. Import a ROMRaider CSV log using the Files picker.
+
+### Run the Core Tests
+
+From the repository root:
+
+```bash
+cd WRXLogCore
+swift test
+```
+
+## Project Scope and Limitations
+
+WRX Log Analyzer is an analysis and visualization tool. It does not:
+
+- flash or modify an ECU
+- change vehicle tuning
+- write data to a vehicle
+- diagnose mechanical failure
+- determine whether a vehicle is safe to operate
+
+Analysis rules are only applied when the selected analysis profile is compatible with the rule's documented scope.
+
+The current sourced rule catalog is intentionally limited while additional analysis rules are researched, implemented, and tested.
+
+## Future Work
+
+Planned areas for continued development include:
+
+- additional sourced analysis rules
+- support for additional Subaru engine families
+- expanded ROMRaider measurement recognition
+- improved chart interaction and comparison
+- analysis of additional knock and fueling measurements
+- comparison between multiple logs
+- broader automated test coverage
+- continuous integration for automated GitHub pull-request checks
